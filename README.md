@@ -1,2 +1,2 @@
 # Cockpit
-Welcome to the Cockpit, where you are able to automatically download videos from floatplane
+Welcome to the Cockpit, where you'll be able to automatically download videos from floatplane.
