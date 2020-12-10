@@ -16,6 +16,11 @@ module.exports.User = sequelize.define('user', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  isAdmin: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   createdAt: {
     allowNull: false,
     type: DataTypes.STRING,
