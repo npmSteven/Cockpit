@@ -26,7 +26,8 @@ const init = async () => {
 
     // Routes v1
     const apiv1 = '/api/v1';
-    app.use(`${apiv1}/auth`, require('./routes/api/authRoutes').authRoutes);
+    app.use(`${apiv1}/auth`, require('./routes/api/authRoutes'));
+    app.use(`${apiv1}/connection`, require('./routes/api/connectionRoutes'));
 
     // Listen for requests
     app.listen(server.port, () => console.log(`Server listening on ${server.port}`));

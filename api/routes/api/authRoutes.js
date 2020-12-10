@@ -10,7 +10,7 @@ const { jwt } = require('../../config');
 
 
 router.post('/login', validateAuthRequest, async (req, res) => {
-    const { value: { username, password } } = req;
+    const { username, password } = req.value;
     try {
         const user = await User.findOne({ where: { username } });
         if (!user) return res.status(404).json(respondError('User does not exist'));
@@ -28,7 +28,7 @@ router.post('/login', validateAuthRequest, async (req, res) => {
 });
 
 router.post('/register', validateAuthRequest, async (req, res) => {
-    const { value: { username, password } } = req;
+    const { username, password } = req.value;
     try {
         const users = await User.findAll({});
         const isAdmin = !users.length;
@@ -57,4 +57,4 @@ router.post('/register', validateAuthRequest, async (req, res) => {
     }
 });
 
-module.exports.authRoutes = router;
+module.exports = router;

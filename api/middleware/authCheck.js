@@ -6,7 +6,7 @@ const { jwt } = require('../config');
 
 module.exports.authCheck = async (req, res, next) => {
   // Get token from headers
-  const token = req.header('x-auth-token');
+  const token = req.header('Authorization');
 
   // Valided that the user gave us a token
   if (!token) {

@@ -16,6 +16,15 @@ module.exports.respondSuccess = (payload) => {
   };
 };
 
+module.exports.respondSuccessMsg = (message) => {
+  return {
+    success: true,
+    payload: {
+      message,
+    }
+  };
+};
+
 module.exports.sanitiseUser = (user) => {
   return {
     id: user.id,
