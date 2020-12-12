@@ -14,9 +14,11 @@ module.exports.FloatplaneCredential = sequelize.define('floatplaneCredential', {
   },
   floatplaneUserId: {
     type: DataTypes.STRING,
+    defaultValue: null,
   },
   floatplaneUserImage: {
     type: DataTypes.STRING,
+    defaultValue: null,
   },
   cookie: {
     type: DataTypes.STRING(1000),

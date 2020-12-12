@@ -13,10 +13,10 @@ module.exports.authCheck = async (req, res, next) => {
     return res.status(401).json(respondError('Token not provided'));
   }
   
-  // Verify token
-  const decoded = jsonwebtoken.verify(token, jwt.secret);
-
   try {
+    // Verify token
+    const decoded = jsonwebtoken.verify(token, jwt.secret);
+    
     const user = User.findByPk(decoded.id);
     if (!user) {
       return res.status(404).json(respondError('User does not exist'));
@@ -26,6 +26,9 @@ module.exports.authCheck = async (req, res, next) => {
 
     next();
   } catch (error) {
+    if(error instanceof jsonwebtoken.TokenExpiredError) {
+      return res.status(401).json(respondError('Token expired'));
+    }
     console.error('ERROR - authCheck():', error);
   }
 };

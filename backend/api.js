@@ -1,20 +1,31 @@
+const { default: Axios } = require('axios');
 const fetch = require('node-fetch');
+const { respondError } = require('./common');
 
-module.exports.post = async (url, body) => {
+module.exports.post = async (url, headers, body, res) => {
   try {
-    const response = await fetch(url, {
-      method: 'POST',
+    const config = {
+      method: 'post',
+      url,
       headers: {
+        ...headers,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
-    });
-    const cookie = response.headers.get('Set-Cookie');
-    if (response.ok) {
-      const payload = await response.json();
-      return { ...payload, cookie };
-    }
+      data: JSON.stringify(body),
+    };
+    const response = await Axios(config);
+    const cookie = response.headers['set-cookie'].reduce((a, b, i) => {
+      if (i === 0) {
+        b += ';';
+      }
+      return a += b;
+    }, '');
+    return { ...response.data, cookie };
   } catch (error) {
+    const { response } = error;
+    if (((response || {}).data || {}).message) {
+      return res.status(response.status).json(respondError(response.data.message))
+    }
     console.error('ERROR - post():', error);
   }
 }
