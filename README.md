@@ -10,5 +10,5 @@ GET /api/v1/channels/:channelId/settings
 Updates the selected channel settings and returns the updated settings
 PUT /api/v1/channels/:channelId/settings
 
-Return all of the videos of the selected channel from the
+Return all of the videos of the selected channel
 GET /api/v1/channels/:channelId/videos
