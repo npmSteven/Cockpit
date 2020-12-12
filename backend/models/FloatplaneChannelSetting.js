@@ -12,13 +12,17 @@ module.exports.FloatplaneChannelSetting = sequelize.define('floatplaneChannelSet
     type: DataTypes.STRING,
     allowNull: false,
   },
+  isSubscribed: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
   channelId: {
     type: DataTypes.STRING,
     allowNull: false,
   },
   directoryName: {
     type: DataTypes.STRING,
-    allowNull: false,
+    defaultValue: null,
   },
   automaticallyDownload: {
     type: DataTypes.BOOLEAN,
