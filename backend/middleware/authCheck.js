@@ -18,9 +18,7 @@ module.exports.authCheck = async (req, res, next) => {
     const decoded = jsonwebtoken.verify(token, jwt.secret);
     
     const user = await User.findByPk(decoded.id);
-    if (!user) {
-      return res.status(404).json(respondError('User does not exist'));
-    }
+    if (!user) return res.status(404).json(respondError('User does not exist'));
 
     req.user = decoded;
 

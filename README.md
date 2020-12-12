@@ -12,3 +12,5 @@ PUT /api/v1/channels/:channelId/settings
 
 Return all of the videos of the selected channel
 GET /api/v1/channels/:channelId/videos
+
+add middleware to validate the current connections
