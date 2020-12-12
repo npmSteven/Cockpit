@@ -1,13 +1,11 @@
 const router = require('express').Router();
-const fetch = require('node-fetch');
 const { v4 } = require('uuid');
 
 const { FloatplaneCredential } = require('../../models/FloatplaneCredential');
 const { post } = require('../../api');
 const { authCheck } = require('../../middleware/authCheck');
 const { validateFloatplaneLoginRequest, validateFloatplaneTokenRequest } = require('../../middleware/validateRequest');
-const { getCurrentDateTime, respondSuccess, respondError } = require('../../common');
-const { default: Axios } = require('axios');
+const { getCurrentDateTime, respondSuccess, respondError, sanitiseUser } = require('../../common');
 
 const url = 'https://www.floatplane.com/api';
 
@@ -36,8 +34,6 @@ router.post('/floatplane/login', authCheck, validateFloatplaneLoginRequest, asyn
     return res.status(500).json(respondError('Internal server error'));
   }
 });
-
-// TODO: Remove cookie from validation 
 
 router.post('/floatplane/2fa', authCheck, validateFloatplaneTokenRequest, async (req, res) => {
   try {

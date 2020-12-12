@@ -1,5 +1,4 @@
 const { default: Axios } = require('axios');
-const fetch = require('node-fetch');
 const { respondError } = require('./common');
 
 module.exports.post = async (url, headers, body, res) => {
