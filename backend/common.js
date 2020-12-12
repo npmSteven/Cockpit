@@ -30,7 +30,6 @@ module.exports.sanitiseUser = (user) => {
     id: user.id,
     username: user.username,
     createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
   };
 };
 

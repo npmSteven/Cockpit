@@ -69,7 +69,6 @@ const getOrCreateFloatplaneCredential = async (userId) => {
       id: v4(),
       userId,
       createdAt: currentDateTime,
-      updatedAt: currentDateTime,
     });
   } catch (error) {
     console.error('ERROR - getOrCreateFloatplaneCredential():', error);

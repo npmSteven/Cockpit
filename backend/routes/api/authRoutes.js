@@ -44,7 +44,6 @@ router.post('/register', validateAuthRequest, async (req, res) => {
             password: hash,
             isAdmin,
             createdAt: currentDateTime,
-            updatedAt: currentDateTime,
         });
         if (!newUser) return res.status(500).json(respondError('Somthing went wrong while trying to create your user'));
 

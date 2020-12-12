@@ -2,27 +2,34 @@ const { DataTypes } = require('sequelize');
 
 const { sequelize } = require('../db');
 
-module.exports.User = sequelize.define('user', {
+module.exports.FloatplaneVideo = sequelize.define('FloatplaneVideo', {
   id: {
     type: DataTypes.STRING,
     allowNull: false,
     primaryKey: true,
   },
-  username: {
+  userId: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  password: {
+  channelId: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  isAdmin: {
-    type: DataTypes.BOOLEAN,
+  videoId: {
+    type: DataTypes.STRING,
     allowNull: false,
-    defaultValue: false,
+  },
+  downloadProgress: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  downloadStatus: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   createdAt: {
-    allowNull: false,
     type: DataTypes.STRING,
+    allowNull: false,
   },
 }, { createdAt: false, updatedAt: false });

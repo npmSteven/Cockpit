@@ -2,27 +2,36 @@ const { DataTypes } = require('sequelize');
 
 const { sequelize } = require('../db');
 
-module.exports.User = sequelize.define('user', {
+module.exports.FloatplaneChannelSetting = sequelize.define('floatplaneChannelSetting', {
   id: {
     type: DataTypes.STRING,
     allowNull: false,
     primaryKey: true,
   },
-  username: {
+  userId: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  password: {
+  channelId: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  isAdmin: {
+  directoryName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  automaticallyDownload: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
   },
-  createdAt: {
+  downloadQuality: {
+    type: DataTypes.INTEGER,
     allowNull: false,
+    defaultValue: 1080,
+  },
+  createdAt: {
     type: DataTypes.STRING,
+    allowNull: false,
   },
 }, { createdAt: false, updatedAt: false });
