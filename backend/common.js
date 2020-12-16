@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const { DateTime } = require('luxon');
 
 module.exports.respondError = (message) => {
   return {
@@ -33,7 +34,7 @@ module.exports.sanitiseUser = (user) => {
   };
 };
 
-module.exports.getCurrentTimestamp = () => Date.now();
+module.exports.getCurrentTimestamp = () => Math.floor(Date.now() / 1000);
 
 module.exports.generateHash = async (password) => {
   try {
@@ -44,7 +45,8 @@ module.exports.generateHash = async (password) => {
   }
 };
 
-module.exports.extractExpiresFromCookie = (cookie) => {
+module.exports.extractExpiresFromCookieToTimestamp = (cookie) => {
   const expiryDate = cookie.split(";").find(item => item.includes('Expires')).trim().replace('Expires=', '');
-  
+  const dt = DateTime.fromHTTP(expiryDate).toJSDate();
+  return new Date(dt).getTime() / 1000;
 }

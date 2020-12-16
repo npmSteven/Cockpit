@@ -17,11 +17,10 @@ router.post('/floatplane/login', authCheck, validateFloatplaneLoginRequest, asyn
     const payload = await login(username, password);
     if (!payload) return res.status(401).json(respondError('Username or password was incorrect for floatplane'));
 
-    const updatedFloatplaneCredential = await updateFloatplaneCredential(req.user.id, payload);
+    await updateFloatplaneCredential(req.user.id, payload);
 
     if (!payload.needs2FA) {
-      const channels = await getChannels(updatedFloatplaneCredential.cookie);
-      await updateChannels(req.user.id, channels, true);
+      await updateChannels(req.user.id, true);
     }
 
     return res.json(respondSuccess({ needs2FA: payload.needs2FA }));
@@ -43,11 +42,10 @@ router.post('/floatplane/2fa', authCheck, validateFloatplaneTokenRequest, async 
     const payload = await token2fa(token, floatplaneCredential.cookie2fa);
     if (!payload) return res.status(401).json(respondError('Token was incorrect for floatplane'));
 
-    const updatedFloatplaneCredential = await updateFloatplaneCredential(req.user.id, payload);
+    await updateFloatplaneCredential(req.user.id, payload);
 
     if (!payload.needs2FA) {
-      const channels = await getChannels(updatedFloatplaneCredential.cookie);
-      await updateChannels(req.user.id, channels, true);
+      await updateChannels(req.user.id, true);
     }
 
     return res.json(respondSuccess({ needs2FA: payload.needs2FA }));

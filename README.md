@@ -1,9 +1,6 @@
 # Cockpit
 Welcome to the Cockpit, where you'll be able to automatically download videos from floatplane.
 
-Return json object with a list of channels the user is subscribed to 
-GET /api/v1/channels
-
 Returns the selected channel settings
 GET /api/v1/channels/:channelId/settings
 

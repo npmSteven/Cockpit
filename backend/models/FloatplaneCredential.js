@@ -20,6 +20,10 @@ module.exports.FloatplaneCredential = sequelize.define('floatplaneCredential', {
     type: DataTypes.STRING,
     defaultValue: null,
   },
+  cookieExpires: {
+    type: DataTypes.STRING,
+    defaultValue: null,
+  },
   cookie: {
     type: DataTypes.STRING(1000),
   },

@@ -1,5 +1,5 @@
 const { v4 } = require("uuid");
-const { getCurrentTimestamp } = require("../common");
+const { getCurrentTimestamp, extractExpiresFromCookieToTimestamp } = require("../common");
 const { FloatplaneCredential } = require("../models/FloatplaneCredential");
 
 module.exports.getOrCreateFloatplaneCredential = async (userId) => {
@@ -26,12 +26,16 @@ module.exports.updateFloatplaneCredential = async (userId, payload) => {
         floatplaneUserId: null,
         floatplaneUserImage: null,
         cookie2fa: payload.cookie,
+        cookieExpires: null,
         cookie: null,
       });
     }
+    // Get expiry from cookie
+    const cookieExpires = extractExpiresFromCookieToTimestamp(payload.cookie);
     return floatplaneCredential.update({
       floatplaneUserId: payload.user.id,
       floatplaneUserImage: payload.user.profileImage.path,
+      cookieExpires,
       cookie2fa: null,
       cookie: payload.cookie,
     });
