@@ -33,7 +33,7 @@ module.exports.sanitiseUser = (user) => {
   };
 };
 
-module.exports.getCurrentDateTime = () => `${new Date()}`;
+module.exports.getCurrentTimestamp = () => Date.now();
 
 module.exports.generateHash = async (password) => {
   try {
@@ -43,3 +43,8 @@ module.exports.generateHash = async (password) => {
     throw error;
   }
 };
+
+module.exports.extractExpiresFromCookie = (cookie) => {
+  const expiryDate = cookie.split(";").find(item => item.includes('Expires')).trim().replace('Expires=', '');
+  
+}

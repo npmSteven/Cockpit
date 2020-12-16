@@ -22,7 +22,7 @@ module.exports.User = sequelize.define('user', {
     defaultValue: false,
   },
   createdAt: {
-    allowNull: false,
     type: DataTypes.STRING,
+    allowNull: false,
   },
 }, { createdAt: false, updatedAt: false });

@@ -1,7 +1,7 @@
 const { default: Axios } = require('axios');
 const { respondError } = require('./common');
 
-module.exports.post = async (url, headers, body, res) => {
+module.exports.post = async ({ url, headers = {}, body = {} }) => {
   const config = {
     method: 'post',
     url,
@@ -13,24 +13,18 @@ module.exports.post = async (url, headers, body, res) => {
   };
   try {
     const response = await Axios(config);
-    const cookie = response.headers['set-cookie'].reduce((a, b, i) => {
-      if (i === 0) {
-        b += ';';
-      }
+    const cookie = response.headers['set-cookie'].reduce((a, b) => {
+      if (i === 0) b += ';';
       return a += b;
     }, '');
     return { ...response.data, cookie };
   } catch (error) {
-    const { response } = error;
-    if (((response || {}).data || {}).message) {
-      return res.status(response.status).json(respondError(response.data.message))
-    }
-    console.error('ERROR - post()');
+    console.error('ERROR - post():', error);
     return null;
   }
 }
 
-module.exports.get = async (url, headers, res) => {
+module.exports.get = async ({ url, headers }) => {
   const config = {
     method: 'get',
     url,
@@ -43,7 +37,7 @@ module.exports.get = async (url, headers, res) => {
     const response = await Axios(config);
     return response.data;
   } catch (error) {
-    console.log('ERROR - get()');
+    console.log('ERROR - get():', error);
     return null;
   }
 }

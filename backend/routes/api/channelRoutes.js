@@ -1,7 +1,8 @@
 const router = require('express').Router();
 
+const { DateTime } = require('luxon');
 const { v4 } = require('uuid');
-const { respondSuccess, getCurrentDateTime } = require('../../common');
+const { respondSuccess, getCurrentTimestamp } = require('../../common');
 const { getChannels } = require('../../floatplaneApi');
 const { authCheck } = require('../../middleware/authCheck');
 const { connectionCheck } = require('../../middleware/connectionCheck');
@@ -20,7 +21,7 @@ router.get('/', authCheck, connectionCheck, async (req, res) => {
         channelId: channel.creator,
         userId,
         isSubscribed: true,
-        createdAt: getCurrentDateTime(),
+        createdAt: getCurrentTimestamp(),
       });
     }
   }
@@ -28,15 +29,16 @@ router.get('/', authCheck, connectionCheck, async (req, res) => {
   // Update isSubscribed
   const channelsSettings = await FloatplaneChannelSetting.findAll({ where: { userId } });
 
-  const channelIdsFloatplane = channels.map(channel => channel.creator);
-  const channelIdsDb = channelsSettings.map(channelSettings => channelSettings.channelId);
+  const unsubscibedChannels = channelsSettings.filter(channelSettings => {
+    return !channels.find(({ creator }) => creator === channelSettings.channelId);
+  });
 
+  for (const unsubscibedChannel of unsubscibedChannels) {
+    if (unsubscibedChannel.isSubscribed) {
+      await unsubscibedChannel.update({ isSubscribed: false });
+    }
+  }
   
-
-  console.log(channelIds);
-
-
-
   return res.json(respondSuccess(channels));
 });
 
@@ -48,7 +50,7 @@ const getOrCreateFloatplaneChannelSetting = async (userId, channelId) => {
     userId,
     channelId,
     isSubscribed: true,
-    createdAt: getCurrentDateTime(),
+    createdAt: getCurrentTimestamp(),
   });
 }
 

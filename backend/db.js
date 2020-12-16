@@ -6,7 +6,10 @@ const sequelize = new Sequelize(db.url, { protocol: 'postgres', logging: false }
 
 module.exports.sequelize = sequelize;
 
-module.exports.connectDb = () => sequelize.authenticate();
+module.exports.connectDb = async () => {
+  await sequelize.authenticate();
+  console.log('Connected to DB');
+};
 
 // Models
 const { User } = require('./models/User');
@@ -18,6 +21,7 @@ module.exports.syncDb = async () => {
     await User.sync();
     await FloatplaneCredential.sync();
     await FloatplaneChannelSetting.sync();
+    console.log('Synced all of the models');
   } catch (error) {
     console.error('ERROR - syncDb():', error);
   }

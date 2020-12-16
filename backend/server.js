@@ -31,7 +31,7 @@ const init = async () => {
     app.use(`${apiv1}/channels`, require('./routes/api/channelRoutes'));
 
     // Listen for requests
-    app.listen(server.port, () => console.log(`Server listening on ${server.port}`));
+    app.listen(server.port, () => console.log(`Server ready!`));
   } catch (error) {
     console.error('ERROR - init():', error);
   }

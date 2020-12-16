@@ -27,7 +27,7 @@ module.exports.FloatplaneCredential = sequelize.define('floatplaneCredential', {
     type: DataTypes.STRING(1000),
   },
   createdAt: {
-    allowNull: false,
     type: DataTypes.STRING,
+    allowNull: false,
   },
 }, { createdAt: false, updatedAt: false });

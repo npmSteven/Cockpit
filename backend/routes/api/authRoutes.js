@@ -5,7 +5,7 @@ const { v4 } = require('uuid');
 
 const { User } = require('../../models/User');
 const { validateAuthRequest } = require('../../middleware/validateRequest');
-const { respondError, respondSuccess, generateHash, getCurrentDateTime, sanitiseUser } = require('../../common');
+const { respondError, respondSuccess, generateHash, getCurrentTimestamp, sanitiseUser } = require('../../common');
 const { jwt } = require('../../config');
 
 
@@ -36,7 +36,7 @@ router.post('/register', validateAuthRequest, async (req, res) => {
 
         const hash = await generateHash(password);
 
-        const currentDateTime = getCurrentDateTime();
+        const currentDateTime = getCurrentTimestamp();
 
         const newUser = await User.create({
             id: v4(),

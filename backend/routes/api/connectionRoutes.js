@@ -2,16 +2,18 @@ const router = require('express').Router();
 const { v4 } = require('uuid');
 
 const { FloatplaneCredential } = require('../../models/FloatplaneCredential');
-const { post } = require('../../api');
 const { authCheck } = require('../../middleware/authCheck');
 const { validateFloatplaneLoginRequest, validateFloatplaneTokenRequest } = require('../../middleware/validateRequest');
-const { getCurrentDateTime, respondSuccess, respondError, sanitiseUser } = require('../../common');
+const { getCurrentTimestamp, respondSuccess, respondError } = require('../../common');
+const { login, token2fa } = require('../../floatplaneApi');
 
 const url = 'https://www.floatplane.com/api';
 
 router.post('/floatplane/login', authCheck, validateFloatplaneLoginRequest, async (req, res) => {
   try {
-    const payload = await post(`${url}/v2/auth/login`, {}, req.value, res);
+    const { username, password } = req.value;
+    const payload = await login(username, password);
+    if (!payload) return res.status(401).json(respondError('Username or password was incorrect for floatplane'));
     const floatplaneCredential = await getOrCreateFloatplaneCredential(req.user.id, payload);
     if (payload.needs2FA) {
       await floatplaneCredential.update({
@@ -36,13 +38,15 @@ router.post('/floatplane/login', authCheck, validateFloatplaneLoginRequest, asyn
 });
 
 router.post('/floatplane/2fa', authCheck, validateFloatplaneTokenRequest, async (req, res) => {
+  const { token } = req.value;
   try {
     // Check if the user has a cookie2fa
     const floatplaneCredential = await FloatplaneCredential.findOne({ where: { userId: req.user.id } });
     if (!floatplaneCredential || !floatplaneCredential.cookie2fa) return res.status(404).json(respondError('You have not attempted to connect your floatplane login'));
     if (floatplaneCredential.cookie) return res.status(401).json(respondError('Already logged in'));  
   
-    const payload = await post(`${url}/v2/auth/checkFor2faLogin`, { 'Cookie': floatplaneCredential.cookie2fa }, req.value, res);
+    const payload = await token2fa(token, floatplaneCredential.cookie2fa);
+    if (!payload) return res.status(401).json(respondError('Token was incorrect for floatplane'));
     if (payload.needs2FA) {
       return res.status(500).json(respondError('Something went wrong need 2fa again'));
     }
@@ -64,7 +68,7 @@ const getOrCreateFloatplaneCredential = async (userId) => {
   try {
     const floatplaneCredential = await FloatplaneCredential.findOne({ where: { userId } });
     if (floatplaneCredential) return floatplaneCredential;
-    const currentDateTime = getCurrentDateTime();
+    const currentDateTime = getCurrentTimestamp();
     return FloatplaneCredential.create({
       id: v4(),
       userId,
