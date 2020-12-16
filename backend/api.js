@@ -13,7 +13,7 @@ module.exports.post = async ({ url, headers = {}, body = {} }) => {
   };
   try {
     const response = await Axios(config);
-    const cookie = response.headers['set-cookie'].reduce((a, b) => {
+    const cookie = response.headers['set-cookie'].reduce((a, b, i) => {
       if (i === 0) b += ';';
       return a += b;
     }, '');
