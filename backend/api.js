@@ -37,7 +37,7 @@ module.exports.get = async ({ url, headers }) => {
     const response = await Axios(config);
     return response.data;
   } catch (error) {
-    console.log('ERROR - get():', error);
+    console.error('ERROR - get():', error);
     return null;
   }
 }
