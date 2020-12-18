@@ -49,4 +49,14 @@ module.exports.extractExpiresFromCookieToTimestamp = (cookie) => {
   const expiryDate = cookie.split(";").find(item => item.includes('Expires')).trim().replace('Expires=', '');
   const dt = DateTime.fromHTTP(expiryDate).toJSDate();
   return new Date(dt).getTime() / 1000;
-}
+};
+
+module.exports.extractVideoDetails = (video) => {
+  return {
+    channelId: video.creator.id,
+    videoId: video.videoAttachments[0],
+    title: video.title,
+    thumbnail: video.thumbnail.path,
+    releaseDate: video.releaseDate,
+  }
+};

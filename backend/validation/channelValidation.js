@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const { channelId, directoryName, automaticallyDownload, downloadQuality } = require('./commonValidation');
 
-module.exports.channelValidationSettings = Joi.object({
+module.exports.channelValidationChannelId = Joi.object({
   channelId,
 });
 

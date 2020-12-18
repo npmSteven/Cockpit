@@ -8,6 +8,7 @@ const { respondSuccess, respondError } = require('../../common');
 const { login, token2fa, getChannels } = require('../../floatplaneApi');
 const { updateFloatplaneCredential } = require('../../services/floatplaneCredential');
 const { updateChannels } = require('../../services/floatplaneChannelSetting');
+const { syncVideos } = require('../../services/floatplaneVideo');
 
 const url = 'https://www.floatplane.com/api';
 
@@ -20,7 +21,8 @@ router.post('/floatplane/login', authCheck, validateFloatplaneLoginRequest, asyn
     await updateFloatplaneCredential(req.user.id, payload);
 
     if (!payload.needs2FA) {
-      await updateChannels(req.user.id, true);
+      const floatplaneChannelsSettings = await updateChannels(req.user.id, true);
+      await Promise.all(floatplaneChannelsSettings.map(floatplaneChannelSettings => syncVideos(req.user.id, floatplaneChannelSettings.channelId, payload.cookie)));
     }
 
     return res.json(respondSuccess({ needs2FA: payload.needs2FA }));
@@ -37,15 +39,16 @@ router.post('/floatplane/2fa', authCheck, validateFloatplaneTokenRequest, async 
     // Check if the user has a cookie2fa
     if (!floatplaneCredential || !floatplaneCredential.cookie2fa) return res.status(404).json(respondError('You have not attempted to connect your floatplane login'));
     // Check if the user has a cookie
-    if (floatplaneCredential.cookie) return res.status(401).json(respondError('Already logged in'));  
-  
+    if (floatplaneCredential.cookie) return res.status(401).json(respondError('Already logged in'));
+
     const payload = await token2fa(token, floatplaneCredential.cookie2fa);
     if (!payload) return res.status(401).json(respondError('Token was incorrect for floatplane'));
 
     await updateFloatplaneCredential(req.user.id, payload);
 
     if (!payload.needs2FA) {
-      await updateChannels(req.user.id, true);
+      const floatplaneChannelsSettings = await updateChannels(req.user.id, true);
+      await Promise.all(floatplaneChannelsSettings.map(floatplaneChannelSettings => syncVideos(req.user.id, floatplaneChannelSettings.channelId, payload.cookie)));
     }
 
     return res.json(respondSuccess({ needs2FA: payload.needs2FA }));

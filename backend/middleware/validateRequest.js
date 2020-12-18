@@ -1,6 +1,6 @@
 const { respondError } = require("../common");
 const { authValidation } = require("../validation/authValidation");
-const { channelValidation, channelValidationSettings, channelValidationSettingsUpdate } = require("../validation/channelValidation");
+const { channelValidationSettingsUpdate, channelValidationChannelId } = require("../validation/channelValidation");
 const { floatplaneLoginValidation } = require("../validation/floatplaneLoginValidation");
 const { floatplaneTokenValidation } = require("../validation/floatplaneTokenValidation");
 
@@ -31,8 +31,8 @@ module.exports.validateFloatplaneTokenRequest = (req, res, next) => {
   next();
 };
 
-module.exports.validateChannelSettingsRequest = (req, res, next) => {
-  const { error, value } = channelValidationSettings.validate(req.params);
+module.exports.validateChannelIdRequest = (req, res, next) => {
+  const { error, value } = channelValidationChannelId.validate(req.params);
   if (error) {
     return res.status(400).json(respondError(error.details[0].message))
   }

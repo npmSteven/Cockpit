@@ -1,11 +1,14 @@
 const router = require('express').Router();
 
 const { respondSuccess, respondError } = require('../../common');
+const { getVideos } = require('../../floatplaneApi');
 const { authCheck } = require('../../middleware/authCheck');
 const { connectionCheck } = require('../../middleware/connectionCheck');
-const { validateChannelSettingsRequest, validateChannelSettingsUpdateRequest } = require('../../middleware/validateRequest');
+const { validateChannelIdRequest, validateChannelSettingsUpdateRequest } = require('../../middleware/validateRequest');
 const { FloatplaneChannelSetting } = require('../../models/FloatplaneChannelSetting');
+const { FloatplaneVideo } = require('../../models/FloatplaneVideo');
 const { updateChannels } = require('../../services/floatplaneChannelSetting');
+const { syncVideos } = require('../../services/floatplaneVideo');
 
 router.get('/', authCheck, connectionCheck, async (req, res) => {
   const userId = req.user.id;
@@ -17,7 +20,7 @@ router.get('/', authCheck, connectionCheck, async (req, res) => {
   }
 });
 
-router.get('/:channelId/settings', authCheck, connectionCheck, validateChannelSettingsRequest, async (req, res) => {
+router.get('/:channelId/settings', authCheck, connectionCheck, validateChannelIdRequest, async (req, res) => {
   const userId = req.user.id;
   const { channelId } = req.value;
   try {
@@ -47,6 +50,19 @@ router.put('/:channelId/settings', authCheck, connectionCheck, validateChannelSe
     console.error('ERROR - /:channelId/settings:', error);
     return res.status(500).json(respondError('Internal server error'));
   }
+});
+
+router.get('/:channelId/videos', authCheck, connectionCheck, validateChannelIdRequest, async (req, res) => {
+  const userId = req.user.id;
+  const { channelId } = req.value;
+
+  const floatplaneChannelSettings = await FloatplaneChannelSetting.findOne({ where: { userId, channelId } });
+  if (!floatplaneChannelSettings) return res.status(403).json(respondError('You are not subscribed to this channel cannot get videos'));
+
+  await syncVideos(userId, floatplaneChannelSettings.channelId, req.cookie);
+
+  const videos = await FloatplaneVideo.findAll({ where: { userId, channelId } });
+  return res.json(respondSuccess(videos));
 });
 
 module.exports = router;
