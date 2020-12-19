@@ -8,7 +8,6 @@ const { respondSuccess, respondError } = require('../../common');
 const { login, token2fa, getChannels } = require('../../floatplaneApi');
 const { updateFloatplaneCredential } = require('../../services/floatplaneCredential');
 const { updateChannels } = require('../../services/floatplaneChannelSetting');
-const { syncVideos } = require('../../services/floatplaneVideo');
 
 const url = 'https://www.floatplane.com/api';
 
@@ -21,8 +20,7 @@ router.post('/floatplane/login', authCheck, validateFloatplaneLoginRequest, asyn
     await updateFloatplaneCredential(req.user.id, payload);
 
     if (!payload.needs2FA) {
-      const floatplaneChannelsSettings = await updateChannels(req.user.id, true);
-      await Promise.all(floatplaneChannelsSettings.map(floatplaneChannelSettings => syncVideos(req.user.id, floatplaneChannelSettings.channelId, payload.cookie)));
+      await updateChannels(req.user.id, true);
     }
 
     return res.json(respondSuccess({ needs2FA: payload.needs2FA }));
@@ -47,8 +45,7 @@ router.post('/floatplane/2fa', authCheck, validateFloatplaneTokenRequest, async 
     await updateFloatplaneCredential(req.user.id, payload);
 
     if (!payload.needs2FA) {
-      const floatplaneChannelsSettings = await updateChannels(req.user.id, true);
-      await Promise.all(floatplaneChannelsSettings.map(floatplaneChannelSettings => syncVideos(req.user.id, floatplaneChannelSettings.channelId, payload.cookie)));
+      await updateChannels(req.user.id, true);
     }
 
     return res.json(respondSuccess({ needs2FA: payload.needs2FA }));

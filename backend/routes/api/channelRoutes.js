@@ -1,14 +1,12 @@
 const router = require('express').Router();
 
 const { respondSuccess, respondError } = require('../../common');
-const { getVideos } = require('../../floatplaneApi');
 const { authCheck } = require('../../middleware/authCheck');
 const { connectionCheck } = require('../../middleware/connectionCheck');
 const { validateChannelIdRequest, validateChannelSettingsUpdateRequest } = require('../../middleware/validateRequest');
 const { FloatplaneChannelSetting } = require('../../models/FloatplaneChannelSetting');
 const { FloatplaneVideo } = require('../../models/FloatplaneVideo');
 const { updateChannels } = require('../../services/floatplaneChannelSetting');
-const { syncVideos } = require('../../services/floatplaneVideo');
 
 router.get('/', authCheck, connectionCheck, async (req, res) => {
   const userId = req.user.id;
@@ -59,10 +57,8 @@ router.get('/:channelId/videos', authCheck, connectionCheck, validateChannelIdRe
   const floatplaneChannelSettings = await FloatplaneChannelSetting.findOne({ where: { userId, channelId } });
   if (!floatplaneChannelSettings) return res.status(403).json(respondError('You are not subscribed to this channel cannot get videos'));
 
-  await syncVideos(userId, floatplaneChannelSettings.channelId, req.cookie);
-
   const videos = await FloatplaneVideo.findAll({ where: { userId, channelId } });
-  return res.json(respondSuccess(videos));
+  return res.json(respondSuccess(videos || []));
 });
 
 module.exports = router;

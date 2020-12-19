@@ -11,18 +11,10 @@ module.exports.FloatplaneVideo = sequelize.define('floatplaneVideo', {
   userId: {
     type: DataTypes.STRING,
     allowNull: false,
-    references: {
-      model: 'users',
-      key: 'id',
-    },
   },
   channelId: {
     type: DataTypes.STRING,
     allowNull: false,
-    references: {
-      model: 'floatplaneChannelSettings',
-      key: 'id',
-    },
   },
   videoId: {
     type: DataTypes.STRING,
