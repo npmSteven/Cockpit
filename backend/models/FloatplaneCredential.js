@@ -11,6 +11,10 @@ module.exports.FloatplaneCredential = sequelize.define('floatplaneCredential', {
   userId: {
     type: DataTypes.STRING,
     allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id',
+    },
   },
   floatplaneUserId: {
     type: DataTypes.STRING,

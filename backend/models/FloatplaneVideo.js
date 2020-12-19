@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 
 const { sequelize } = require('../db');
 
-module.exports.FloatplaneVideo = sequelize.define('FloatplaneVideo', {
+module.exports.FloatplaneVideo = sequelize.define('floatplaneVideo', {
   id: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -11,10 +11,18 @@ module.exports.FloatplaneVideo = sequelize.define('FloatplaneVideo', {
   userId: {
     type: DataTypes.STRING,
     allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id',
+    },
   },
   channelId: {
     type: DataTypes.STRING,
     allowNull: false,
+    references: {
+      model: 'floatplaneChannelSettings',
+      key: 'id',
+    },
   },
   videoId: {
     type: DataTypes.STRING,

@@ -11,6 +11,10 @@ module.exports.FloatplaneChannelSetting = sequelize.define('floatplaneChannelSet
   userId: {
     type: DataTypes.STRING,
     allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id',
+    },
   },
   isSubscribed: {
     type: DataTypes.BOOLEAN,
