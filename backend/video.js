@@ -1,4 +1,7 @@
 const { Op } = require('sequelize');
+const { DownloaderHelper } = require('node-downloader-helper');
+const fs = require('fs');
+
 const {
   FloatplaneChannelSetting,
 } = require('./models/FloatplaneChannelSetting');
@@ -6,35 +9,89 @@ const { FloatplaneCredential } = require('./models/FloatplaneCredential');
 const { FloatplaneVideo } = require('./models/FloatplaneVideo');
 const { syncVideos } = require('./services/floatplaneVideo');
 const { updateChannels } = require('./services/floatplaneChannelSetting');
+const { getVideoDownloads, getVideos } = require('./floatplaneApi');
+const { throttle } = require('./common');
 
 module.exports.syncDownloadVideos = async () => {
+  // Sync all of the channels and videos
+  await syncAllChannelsAndVideos();
+
+  // Get all channels with automaticallyDownload enabled
+  const floatplaneChannels = await FloatplaneChannelSetting.findAll({
+    where: {
+      automaticallyDownload: true,
+      isSubscribed: true,
+      directoryName: {
+        [Op.ne]: null,
+      },
+    },
+  });
+
+  await Promise.all(floatplaneChannels.map(async ({ channelId, automaticallyDownloadTimestamp, userId, downloadQuality, directoryName }) => {
+    const { cookie } = await FloatplaneCredential.findOne({ where: { userId } });
+    const channelVideos = await getChannelVideos(channelId, automaticallyDownloadTimestamp);
+    return Promise.all(channelVideos.map(async (channelVideo) => {
+      const { videoId, title } = channelVideo;
+      const videoDownload = await getVideoDownloads(videoId, cookie);
+      const videoDownloadLink = buildVideoDownloadLink(videoDownload, downloadQuality);
+      // Check if videos folder exists
+      if (!fs.existsSync(`${__dirname}/videos`)){
+        fs.mkdirSync(`${__dirname}/videos`);
+      }
+      // Check if directoryName exists inside of videos
+      if (!fs.existsSync(`${__dirname}/videos/${directoryName}`)){
+        fs.mkdirSync(`${__dirname}/videos/${directoryName}`);
+      }
+      const dl = new DownloaderHelper(videoDownloadLink, `${__dirname}/videos/${directoryName}/`, { fileName: `${title}.mp4` });
+      dl.on('progress', throttle((async ({ progress }) => {
+        await channelVideo.update({
+          downloadProgress: Math.round(progress),
+          downloadStatus: 'downloading',
+        });
+      }), 2000));
+      dl.on('end', async () => {
+        await channelVideo.update({
+          downloadProgress: 100,
+          downloadStatus: 'downloaded',
+        });
+      });
+      dl.start();
+    }));
+  }));
+
+};
+
+
+
+const buildVideoDownloadLink = (videoDownload, downloadQuality) => {
+  const edge = videoDownload.edges.find(edge => edge.allowDownload);
+  const uriWithQuality = videoDownload.resource.uri.replace('{qualityLevels}', downloadQuality);
+  const uriWithToken = uriWithQuality.replace('{token}', videoDownload.resource.data.token);
+  return `https://${edge.hostname}${uriWithToken}`;
+}
+
+const getChannelVideos = async (channelId, automaticallyDownloadTimestamp) => {
+  // Get all of the relevant videos
+  const channelVideos = await FloatplaneVideo.findAll({
+    where: {
+      releaseDate: {
+        [Op.gte]: automaticallyDownloadTimestamp,
+      },
+      downloadStatus: 'download',
+      channelId,
+    },
+  });
+  return channelVideos;
+};
+
+const syncAllChannelsAndVideos = async () => {
   // Sync all channels and videos
   const floatplaneCredentials = await FloatplaneCredential.findAll();
-  Promise.all(
+  await Promise.all(
     floatplaneCredentials.map(({ userId, cookie }) =>
       syncChannelsAndVideos(userId, cookie)
     )
   );
-
-  // Get all channels with automaticallyDownload enabled
-  const floatplaneChannels = await FloatplaneChannelSetting.findAll({
-    where: { automaticallyDownload: true },
-  });
-
-  // Get all of the relevant videos
-  const [videos] = await Promise.all(
-    floatplaneChannels.map(({ automaticallyDownloadTimestamp }) => {
-      return FloatplaneVideo.findAll({
-        where: {
-          releaseDate: {
-            [Op.gte]: automaticallyDownloadTimestamp,
-          },
-          downloadStatus: 'download',
-        },
-      });
-    })
-  );
-  console.log(videos.map((v) => v.title));
 };
 
 const syncChannelsAndVideos = async (userId, cookie) => {

@@ -8,8 +8,7 @@ module.exports.floatplaneDomain = floatplaneDomain;
 module.exports.getChannels = async (cookie) => {
   try {
     const channels = await get({ url: `${floatplaneDomain}/v2/user/subscriptions`, headers: { cookie } });
-    if (!channels) return null;
-    return channels;
+    return channels || null;
   } catch (error) {
     console.error('ERROR - getChannels():', error);
     return null;
@@ -19,8 +18,7 @@ module.exports.getChannels = async (cookie) => {
 module.exports.login = async (username, password) => {
   try {
     const login = await post({ url: `${floatplaneDomain}/v2/auth/login`, body: { username, password }});
-    if (!login) return null;
-    return login;
+    return login || null;
   } catch (error) {
     console.error('ERROR - login():', error);
     return null;
@@ -29,9 +27,8 @@ module.exports.login = async (username, password) => {
 
 module.exports.token2fa = async (token, cookie2fa) => {
   try {
-    const login = await post({ url: `${floatplaneDomain}/v2/auth/checkFor2faLogin`, headers: { 'Cookie': cookie2fa }, body: { token } });
-    if (!login) return null;
-    return login;
+    const token2fa = await post({ url: `${floatplaneDomain}/v2/auth/checkFor2faLogin`, headers: { 'Cookie': cookie2fa }, body: { token } });
+    return token2fa || null;
   } catch (error) {
     console.error('ERROR - token2fa():', error);
     return null;
@@ -51,3 +48,13 @@ module.exports.getVideos = async (channelId, cookie) => {
     return null;
   }
 };
+
+module.exports.getVideoDownloads = async (videoId, cookie) => {
+  try {
+    const payload = await get({ url: `${floatplaneDomain}/v2/cdn/delivery?type=download&guid=${videoId}`, headers: { cookie } });
+    return payload || null;
+  } catch (error) {
+    console.error('ERROR - getVideos():', error);
+    return null;
+  }
+}

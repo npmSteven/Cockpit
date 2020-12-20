@@ -36,9 +36,9 @@ module.exports.FloatplaneChannelSetting = sequelize.define(
       defaultValue: null,
     },
     downloadQuality: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: 1080,
+      defaultValue: "1080",
     },
     createdAt: {
       type: DataTypes.STRING,

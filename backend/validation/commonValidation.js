@@ -14,4 +14,4 @@ module.exports.directoryName = Joi.required();
 
 module.exports.automaticallyDownload = Joi.boolean().required();
 
-module.exports.downloadQuality = Joi.valid(720, 1080, 2160).required();
+module.exports.downloadQuality = Joi.valid('360', '480', '720', '1080', '2160').required();
