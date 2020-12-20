@@ -2,7 +2,10 @@ const { Sequelize } = require('sequelize');
 
 const { db } = require('./config');
 
-const sequelize = new Sequelize(db.url, { protocol: 'postgres', logging: false });
+const sequelize = new Sequelize(db.url, {
+  protocol: 'postgres',
+  logging: false,
+});
 
 module.exports.sequelize = sequelize;
 
@@ -14,7 +17,9 @@ module.exports.connectDb = async () => {
 // Models
 const { User } = require('./models/User');
 const { FloatplaneCredential } = require('./models/FloatplaneCredential');
-const { FloatplaneChannelSetting } = require('./models/FloatplaneChannelSetting');
+const {
+  FloatplaneChannelSetting,
+} = require('./models/FloatplaneChannelSetting');
 const { FloatplaneVideo } = require('./models/FloatplaneVideo');
 
 module.exports.syncDb = async () => {
@@ -27,4 +32,4 @@ module.exports.syncDb = async () => {
   } catch (error) {
     console.error('ERROR - syncDb():', error);
   }
-}
+};

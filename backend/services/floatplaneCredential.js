@@ -1,10 +1,15 @@
-const { v4 } = require("uuid");
-const { getCurrentTimestamp, extractExpiresFromCookieToTimestamp } = require("../common");
-const { FloatplaneCredential } = require("../models/FloatplaneCredential");
+const { v4 } = require('uuid');
+const {
+  getCurrentTimestamp,
+  extractExpiresFromCookieToTimestamp,
+} = require('../common');
+const { FloatplaneCredential } = require('../models/FloatplaneCredential');
 
 module.exports.getOrCreateFloatplaneCredential = async (userId) => {
   try {
-    const floatplaneCredential = await FloatplaneCredential.findOne({ where: { userId } });
+    const floatplaneCredential = await FloatplaneCredential.findOne({
+      where: { userId },
+    });
     if (floatplaneCredential) return floatplaneCredential;
     const currentDateTime = getCurrentTimestamp();
     return FloatplaneCredential.create({
@@ -16,11 +21,13 @@ module.exports.getOrCreateFloatplaneCredential = async (userId) => {
     console.error('ERROR - getOrCreateFloatplaneCredential():', error);
     return null;
   }
-}
+};
 
 module.exports.updateFloatplaneCredential = async (userId, payload) => {
   try {
-    const floatplaneCredential = await this.getOrCreateFloatplaneCredential(userId);
+    const floatplaneCredential = await this.getOrCreateFloatplaneCredential(
+      userId
+    );
     if (payload.needs2FA) {
       return floatplaneCredential.update({
         floatplaneUserId: null,
@@ -43,4 +50,4 @@ module.exports.updateFloatplaneCredential = async (userId, payload) => {
     console.error('ERROR - updateFloatplaneCredential():', error);
     return null;
   }
-}
+};

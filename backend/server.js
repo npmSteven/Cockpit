@@ -5,6 +5,7 @@ const cors = require('cors');
 // Module imports
 const { server } = require('./config');
 const { connectDb, syncDb } = require('./db');
+const { syncDownloadVideos } = require('./video');
 
 // Init express
 const app = express();
@@ -25,16 +26,19 @@ const init = async () => {
     await syncDb();
 
     // Routes v1
-    const apiv1 = '/api/v1';
-    app.use(`${apiv1}/auth`, require('./routes/api/authRoutes'));
-    app.use(`${apiv1}/connection`, require('./routes/api/connectionRoutes'));
-    app.use(`${apiv1}/channels`, require('./routes/api/channelRoutes'));
+    const apiV1 = '/api/v1';
+    app.use(`${apiV1}/auth`, require('./routes/api/authRoutes'));
+    app.use(`${apiV1}/connection`, require('./routes/api/connectionRoutes'));
+    app.use(`${apiV1}/channels`, require('./routes/api/channelRoutes'));
 
     // Listen for requests
     app.listen(server.port, () => console.log(`Server ready!`));
+
+    // Download/Sync videos
+    await syncDownloadVideos();
   } catch (error) {
     console.error('ERROR - init():', error);
   }
-}
+};
 
 init();

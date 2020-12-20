@@ -22,7 +22,7 @@ module.exports.respondSuccessMsg = (message) => {
     success: true,
     payload: {
       message,
-    }
+    },
   };
 };
 
@@ -46,7 +46,11 @@ module.exports.generateHash = async (password) => {
 };
 
 module.exports.extractExpiresFromCookieToTimestamp = (cookie) => {
-  const expiryDate = cookie.split(";").find(item => item.includes('Expires')).trim().replace('Expires=', '');
+  const expiryDate = cookie
+    .split(';')
+    .find((item) => item.includes('Expires'))
+    .trim()
+    .replace('Expires=', '');
   const dt = DateTime.fromHTTP(expiryDate).toJSDate();
   return new Date(dt).getTime() / 1000;
 };
@@ -57,6 +61,6 @@ module.exports.extractVideoDetails = (video) => {
     videoId: video.videoAttachments[0],
     title: video.title,
     thumbnail: video.thumbnail.path,
-    releaseDate: video.releaseDate,
-  }
+    releaseDate: `${Math.floor(new Date(video.releaseDate).getTime() / 1000)}`,
+  };
 };

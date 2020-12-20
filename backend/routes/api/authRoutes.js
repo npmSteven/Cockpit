@@ -5,55 +5,73 @@ const { v4 } = require('uuid');
 
 const { User } = require('../../models/User');
 const { validateAuthRequest } = require('../../middleware/validateRequest');
-const { respondError, respondSuccess, generateHash, getCurrentTimestamp, sanitiseUser } = require('../../common');
+const {
+  respondError,
+  respondSuccess,
+  generateHash,
+  getCurrentTimestamp,
+  sanitiseUser,
+} = require('../../common');
 const { jwt } = require('../../config');
 
-
 router.post('/login', validateAuthRequest, async (req, res) => {
-    const { username, password } = req.value;
-    try {
-        const user = await User.findOne({ where: { username } });
-        if (!user) return res.status(404).json(respondError('User does not exist'));
+  const { username, password } = req.value;
+  try {
+    const user = await User.findOne({ where: { username } });
+    if (!user) return res.status(404).json(respondError('User does not exist'));
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(401).json(respondError('Incorrect password'));
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res.status(401).json(respondError('Incorrect password'));
 
-        const token = jsonwebtoken.sign({ id: user.id }, jwt.secret, { expiresIn: 86400 });
+    const token = jsonwebtoken.sign({ id: user.id }, jwt.secret, {
+      expiresIn: 86400,
+    });
 
-        return res.json(respondSuccess({ token, user: sanitiseUser(user) }));
-    } catch (error) {
-        console.error('ERROR - /login:', error);
-        return res.status(500).json(respondError('Internal server error'));
-    }
+    return res.json(respondSuccess({ token, user: sanitiseUser(user) }));
+  } catch (error) {
+    console.error('ERROR - /login:', error);
+    return res.status(500).json(respondError('Internal server error'));
+  }
 });
 
 router.post('/register', validateAuthRequest, async (req, res) => {
-    const { username, password } = req.value;
-    try {
-        const users = await User.findAll({});
-        const isAdmin = !users.length;
-        if (!isAdmin) return res.status(401).json(respondError('There can only be one admin user'));
+  const { username, password } = req.value;
+  try {
+    const users = await User.findAll({});
+    const isAdmin = !users.length;
+    if (!isAdmin)
+      return res
+        .status(401)
+        .json(respondError('There can only be one admin user'));
 
-        const hash = await generateHash(password);
+    const hash = await generateHash(password);
 
-        const currentDateTime = getCurrentTimestamp();
+    const currentDateTime = getCurrentTimestamp();
 
-        const newUser = await User.create({
-            id: v4(),
-            username,
-            password: hash,
-            isAdmin,
-            createdAt: currentDateTime,
-        });
-        if (!newUser) return res.status(500).json(respondError('Somthing went wrong while trying to create your user'));
+    const newUser = await User.create({
+      id: v4(),
+      username,
+      password: hash,
+      isAdmin,
+      createdAt: currentDateTime,
+    });
+    if (!newUser)
+      return res
+        .status(500)
+        .json(
+          respondError('Somthing went wrong while trying to create your user')
+        );
 
-        const token = jsonwebtoken.sign({ id: newUser.id }, jwt.secret, { expiresIn: 86400 });
+    const token = jsonwebtoken.sign({ id: newUser.id }, jwt.secret, {
+      expiresIn: 86400,
+    });
 
-        return res.json(respondSuccess({ token, user: sanitiseUser(newUser) }));
-    } catch (error) {
-        console.error('ERROR - /register:', error);
-        return res.status(500).json(respondError('Internal server error'));
-    }
+    return res.json(respondSuccess({ token, user: sanitiseUser(newUser) }));
+  } catch (error) {
+    console.error('ERROR - /register:', error);
+    return res.status(500).json(respondError('Internal server error'));
+  }
 });
 
 module.exports = router;

@@ -1,5 +1,4 @@
 const { default: Axios } = require('axios');
-const { respondError } = require('./common');
 
 module.exports.post = async ({ url, headers = {}, body = {} }) => {
   const config = {
@@ -15,14 +14,14 @@ module.exports.post = async ({ url, headers = {}, body = {} }) => {
     const response = await Axios(config);
     const cookie = response.headers['set-cookie'].reduce((a, b, i) => {
       if (i === 0) b += ';';
-      return a += b;
+      return (a += b);
     }, '');
     return { ...response.data, cookie };
   } catch (error) {
     console.error('ERROR - post():', error);
     return null;
   }
-}
+};
 
 module.exports.get = async ({ url, headers }) => {
   const config = {
@@ -40,4 +39,4 @@ module.exports.get = async ({ url, headers }) => {
     console.error('ERROR - get():', error);
     return null;
   }
-}
+};

@@ -1,12 +1,14 @@
-const { v4 } = require("uuid");
-const { getCurrentTimestamp } = require("../common");
-const { getVideos } = require("../floatplaneApi");
-const { FloatplaneVideo } = require("../models/FloatplaneVideo");
+const { v4 } = require('uuid');
+const { getCurrentTimestamp } = require('../common');
+const { getVideos } = require('../floatplaneApi');
+const { FloatplaneVideo } = require('../models/FloatplaneVideo');
 
 module.exports.getOrCreateFloatplaneVideo = async (userId, video) => {
   const { channelId, videoId, title, thumbnail, releaseDate } = video;
   try {
-    const floatplaneVideo = await FloatplaneVideo.findOne({ where: { userId, channelId, videoId } });
+    const floatplaneVideo = await FloatplaneVideo.findOne({
+      where: { userId, channelId, videoId },
+    });
     if (floatplaneVideo) return floatplaneVideo;
     const currentDateTime = getCurrentTimestamp();
     return FloatplaneVideo.create({
@@ -28,10 +30,12 @@ module.exports.getOrCreateFloatplaneVideo = async (userId, video) => {
 module.exports.syncVideos = async (userId, channelId, cookie) => {
   try {
     const videos = await getVideos(channelId, cookie);
-    await Promise.all(videos.map(video => this.getOrCreateFloatplaneVideo(userId, video)));
+    await Promise.all(
+      videos.map((video) => this.getOrCreateFloatplaneVideo(userId, video))
+    );
     return true;
   } catch (error) {
     console.error('ERROR - syncVideos():', error);
     return null;
   }
-}
+};

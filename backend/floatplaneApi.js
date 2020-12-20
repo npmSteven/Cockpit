@@ -40,7 +40,7 @@ module.exports.token2fa = async (token, cookie2fa) => {
 
 module.exports.getVideos = async (channelId, cookie) => {
   try {
-    const payload = await get({ url: `${floatplaneDomain}/v3/content/creator/list?ids=${channelId}&limit=50`, headers: { cookie } });
+    const payload = await get({ url: `${floatplaneDomain}/v3/content/creator/list?ids=${channelId}`, headers: { cookie } });
     if (!payload) return null;
     // Get videos from blogPosts
     const videos = payload.blogPosts.filter(blogPost => blogPost.metadata.hasVideo);
