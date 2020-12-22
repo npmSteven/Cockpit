@@ -24,7 +24,7 @@ module.exports.User = sequelize.define(
       defaultValue: false,
     },
     createdAt: {
-      type: DataTypes.STRING,
+      type: DataTypes.BIGINT,
       allowNull: false,
     },
   },

@@ -36,6 +36,9 @@ const init = async () => {
 
     // Download/Sync videos
     await syncDownloadVideos();
+    setInterval(async () => {
+      await syncDownloadVideos();
+    }, 150000); // 2.5 minutes
   } catch (error) {
     console.error('ERROR - init():', error);
   }

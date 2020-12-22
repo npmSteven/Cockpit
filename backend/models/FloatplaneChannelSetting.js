@@ -32,7 +32,7 @@ module.exports.FloatplaneChannelSetting = sequelize.define(
       defaultValue: false,
     },
     automaticallyDownloadTimestamp: {
-      type: DataTypes.STRING,
+      type: DataTypes.BIGINT,
       defaultValue: null,
     },
     downloadQuality: {
@@ -41,7 +41,7 @@ module.exports.FloatplaneChannelSetting = sequelize.define(
       defaultValue: "1080",
     },
     createdAt: {
-      type: DataTypes.STRING,
+      type: DataTypes.BIGINT,
       allowNull: false,
     },
   },

@@ -9,56 +9,72 @@ const { FloatplaneCredential } = require('./models/FloatplaneCredential');
 const { FloatplaneVideo } = require('./models/FloatplaneVideo');
 const { syncVideos } = require('./services/floatplaneVideo');
 const { updateChannels } = require('./services/floatplaneChannelSetting');
-const { getVideoDownloads, getVideos } = require('./floatplaneApi');
-const { throttle } = require('./common');
+const { getVideoDownloads } = require('./floatplaneApi');
+const { throttle, getCurrentTimestamp } = require('./common');
 
 module.exports.syncDownloadVideos = async () => {
-  // Sync all of the channels and videos
-  await syncAllChannelsAndVideos();
+  try {
+    console.log('[syncDownloadVideos]: start');
 
-  // Get all channels with automaticallyDownload enabled
-  const floatplaneChannels = await FloatplaneChannelSetting.findAll({
-    where: {
-      automaticallyDownload: true,
-      isSubscribed: true,
-      directoryName: {
-        [Op.ne]: null,
+    // Sync all of the channels and videos
+    await syncAllChannelsAndVideos();
+  
+    // Get all channels with automaticallyDownload enabled
+    const floatplaneChannels = await FloatplaneChannelSetting.findAll({
+      where: {
+        automaticallyDownload: true,
+        isSubscribed: true,
+        directoryName: {
+          [Op.ne]: null,
+        },
       },
-    },
-  });
-
-  await Promise.all(floatplaneChannels.map(async ({ channelId, automaticallyDownloadTimestamp, userId, downloadQuality, directoryName }) => {
-    const { cookie } = await FloatplaneCredential.findOne({ where: { userId } });
-    const channelVideos = await getChannelVideos(channelId, automaticallyDownloadTimestamp);
-    return Promise.all(channelVideos.map(async (channelVideo) => {
-      const { videoId, title } = channelVideo;
-      const videoDownload = await getVideoDownloads(videoId, cookie);
-      const videoDownloadLink = buildVideoDownloadLink(videoDownload, downloadQuality);
-      // Check if videos folder exists
-      if (!fs.existsSync(`${__dirname}/videos`)){
-        fs.mkdirSync(`${__dirname}/videos`);
-      }
-      // Check if directoryName exists inside of videos
-      if (!fs.existsSync(`${__dirname}/videos/${directoryName}`)){
-        fs.mkdirSync(`${__dirname}/videos/${directoryName}`);
-      }
-      const dl = new DownloaderHelper(videoDownloadLink, `${__dirname}/videos/${directoryName}/`, { fileName: `${title}.mp4` });
-      dl.on('progress', throttle((async ({ progress }) => {
-        await channelVideo.update({
-          downloadProgress: Math.round(progress),
-          downloadStatus: 'downloading',
+    });
+  
+    await Promise.all(floatplaneChannels.map(async ({ channelId, automaticallyDownloadTimestamp, userId, downloadQuality, directoryName }) => {
+      const floatplaneCredential = await FloatplaneCredential.findOne({ where: { userId, cookieExpires: {
+        [Op.gt]: getCurrentTimestamp(),
+      } } });
+      if (!floatplaneCredential) return null;
+      const channelVideos = await getChannelVideos(channelId, automaticallyDownloadTimestamp);
+      return Promise.all(channelVideos.map(async (channelVideo) => {
+        const { videoId, title } = channelVideo;
+        const videoDownload = await getVideoDownloads(videoId, floatplaneCredential.cookie);
+        const videoDownloadLink = buildVideoDownloadLink(videoDownload, downloadQuality);
+        // Check if videos folder exists
+        if (!fs.existsSync(`${__dirname}/videos`)){
+          fs.mkdirSync(`${__dirname}/videos`);
+        }
+        // Check if directoryName exists inside of videos
+        if (!fs.existsSync(`${__dirname}/videos/${directoryName}`)){
+          fs.mkdirSync(`${__dirname}/videos/${directoryName}`);
+        }
+        const dl = new DownloaderHelper(videoDownloadLink, `${__dirname}/videos/${directoryName}/`, { fileName: `${title}.mp4` });
+        dl.on('progress', throttle((async ({ progress }) => {
+          await channelVideo.update({
+            downloadProgress: Math.round(progress),
+            downloadStatus: 'downloading',
+          });
+        }), 2000));
+        dl.on('error', async (error) => {
+          await channelVideo.update({
+            downloadProgress: 0,
+            downloadStatus: 'failed',
+          });
+          console.log('ERROR - Download', error);
         });
-      }), 2000));
-      dl.on('end', async () => {
-        await channelVideo.update({
-          downloadProgress: 100,
-          downloadStatus: 'downloaded',
+        dl.on('end', async () => {
+          await channelVideo.update({
+            downloadProgress: 100,
+            downloadStatus: 'downloaded',
+          });
         });
-      });
-      dl.start();
+        dl.start();
+      }));
     }));
-  }));
-
+    console.log('[syncDownloadVideos]: end');
+  } catch (error) {
+    console.error('ERROR - syncDownloadVideos():', error);
+  }
 };
 
 

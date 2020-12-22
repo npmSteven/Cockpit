@@ -23,7 +23,7 @@ module.exports.FloatplaneCredential = sequelize.define(
       defaultValue: null,
     },
     cookieExpires: {
-      type: DataTypes.STRING,
+      type: DataTypes.BIGINT,
       defaultValue: null,
     },
     cookie: {
@@ -33,7 +33,7 @@ module.exports.FloatplaneCredential = sequelize.define(
       type: DataTypes.STRING(1000),
     },
     createdAt: {
-      type: DataTypes.STRING,
+      type: DataTypes.BIGINT,
       allowNull: false,
     },
   },

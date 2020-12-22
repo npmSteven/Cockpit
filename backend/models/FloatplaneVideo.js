@@ -31,7 +31,7 @@ module.exports.FloatplaneVideo = sequelize.define(
       allowNull: false,
     },
     releaseDate: {
-      type: DataTypes.STRING,
+      type: DataTypes.BIGINT,
       allowNull: false,
     },
     downloadProgress: {
@@ -45,7 +45,7 @@ module.exports.FloatplaneVideo = sequelize.define(
       defaultValue: 'download',
     },
     createdAt: {
-      type: DataTypes.STRING,
+      type: DataTypes.BIGINT,
       allowNull: false,
     },
   },
