@@ -1,8 +1,6 @@
-require('dotenv').config();
-
 module.exports = {
   server: {
-    port: process.env.PORT || 8080,
+    port: process.env.PORT,
   },
   db: {
     url: process.env.DATABASE_URL,
