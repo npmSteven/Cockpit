@@ -28,7 +28,7 @@ router.post('/login', validateAuthRequest, async (req, res) => {
       expiresIn: 86400,
     });
 
-    return res.json(respondSuccess({ token, user: sanitiseUser(user), d: 'dasds' }));
+    return res.json(respondSuccess({ token, user: sanitiseUser(user) }));
   } catch (error) {
     console.error('ERROR - /login:', error);
     return res.status(500).json(respondError('Internal server error'));
