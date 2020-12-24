@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Container version="2">
+  <Name>Cockpit API</Name>
+  <Description>Cockpit API for Cockpit frontend</Description>
+  <Registry>https://hub.docker.com/r/stevenrafferty/cockpit/</Registry>
+  <Repository>stevenrafferty/cockpit</Repository>
+  <BindTime>true</BindTime>
+  <Privileged>false</Privileged>
+  <Networking>
+    <Mode>bridge</Mode>
+    <Publish>
+      <Port>
+        <HostPort>8080</HostPort>
+        <ContainerPort>8080</ContainerPort>
+        <Protocol>tcp</Protocol>
+      </Port>
+    </Publish>
+  </Networking>
+  <Environment/>
+  <Config 
+    Type="Path" 
+    Name="Videos" 
+    Target="/app/videos/floatplane" 
+    Default="/mnt/user/appdata/cockpit/videos/floatplane" 
+    Mode="rw" 
+    Description="The folder the floatplane videos will be saved"
+    Required="true">/mnt/user/appdata/cockpit/videos/floatplane
+  </Config>
+  <ExtraParams></ExtraParams>
+</Container>
