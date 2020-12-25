@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const { DownloaderHelper } = require('node-downloader-helper');
 const fs = require('fs');
+const moveFile = require('move-file');
 
 const {
   FloatplaneChannelSetting,
@@ -40,15 +41,22 @@ module.exports.syncDownloadVideos = async () => {
         const { videoId, title } = channelVideo;
         const videoDownload = await getVideoDownloads(videoId, floatplaneCredential.cookie);
         const videoDownloadLink = buildVideoDownloadLink(videoDownload, downloadQuality);
-        // Check if videos folder exists
-        if (!fs.existsSync(`${__dirname}/videos`)){
-          fs.mkdirSync(`${__dirname}/videos`);
-        }
-        // Check if directoryName exists inside of videos
-        if (!fs.existsSync(`${__dirname}/videos/${directoryName}`)){
-          fs.mkdirSync(`${__dirname}/videos/${directoryName}`);
-        }
-        const dl = new DownloaderHelper(videoDownloadLink, `${__dirname}/videos/${directoryName}/`, { fileName: `${title}.mp4` });
+
+        const fileName = `${title}.mp4`;
+        const videosDir = `${__dirname}/videos`; 
+        const videosIncompleteDir = `${__dirname}/videos_incomplete`;
+        const videosChannelDir = `${videosDir}/${directoryName}`;
+        const videosChannelIncompleteDir = `${videosIncompleteDir}/${directoryName}`;
+        const videoDir = `${videosChannelDir}/${fileName}`;
+        const videoIncompleteDir = `${videosChannelIncompleteDir}/${fileName}`;
+
+        checkDir(videosDir);
+        checkDir(videosIncompleteDir);
+        checkDir(videosChannelDir);
+        checkDir(videosChannelIncompleteDir);
+
+        const dl = new DownloaderHelper(videoDownloadLink, videosChannelIncompleteDir, { fileName });
+
         dl.on('progress', throttle((async ({ progress }) => {
           await channelVideo.update({
             downloadProgress: Math.round(progress),
@@ -63,6 +71,7 @@ module.exports.syncDownloadVideos = async () => {
           console.log('ERROR - Download', error);
         });
         dl.on('end', async () => {
+          await moveFile(videoIncompleteDir, videoDir)
           await channelVideo.update({
             downloadProgress: 100,
             downloadStatus: 'downloaded',
@@ -120,3 +129,9 @@ const syncChannelsAndVideos = async (userId, cookie) => {
     );
   }
 };
+
+const checkDir = (dir) => {
+  if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+  }
+}

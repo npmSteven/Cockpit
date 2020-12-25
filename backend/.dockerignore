@@ -30,5 +30,6 @@ server/*.spec.js
 kubernetes
 
 videos
+videos_incomplete
 .env
 .gitignore

@@ -59,7 +59,7 @@ module.exports.extractVideoDetails = (video) => {
   return {
     channelId: video.creator.id,
     videoId: video.videoAttachments[0],
-    title: video.title,
+    title: this.cleanTitle(video.title),
     thumbnail: video.thumbnail.path,
     releaseDate: `${Math.floor(new Date(video.releaseDate).getTime() / 1000)}`,
   };
@@ -76,4 +76,11 @@ module.exports.throttle = (func, limit) => {
       setTimeout(() => inThrottle = false, limit)
     }
   }
+};
+
+module.exports.cleanTitle = (title) => {
+  const titleWithoutSemicolon = title.replace(':', '');
+  const titleWithoutForwardSlash = titleWithoutSemicolon.replace('/', '');
+  const titleWithoutBackSlash = titleWithoutForwardSlash.replace('\\', '');
+  return titleWithoutBackSlash;
 };
