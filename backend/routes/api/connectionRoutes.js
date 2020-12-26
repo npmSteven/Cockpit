@@ -11,8 +11,8 @@ const { login, token2fa } = require('../../floatplaneApi');
 const {
   updateFloatplaneCredential,
 } = require('../../services/floatplaneCredential');
-const { updateChannels } = require('../../services/floatplaneChannelSetting');
 const { syncVideos } = require('../../services/floatplaneVideo');
+const { updateChannels } = require('../../video');
 
 router.post(
   '/floatplane/login',

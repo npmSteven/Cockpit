@@ -11,8 +11,8 @@ const {
   FloatplaneChannelSetting,
 } = require('../../models/FloatplaneChannelSetting');
 const { FloatplaneVideo } = require('../../models/FloatplaneVideo');
-const { updateChannels } = require('../../services/floatplaneChannelSetting');
 const { syncVideos } = require('../../services/floatplaneVideo');
+const { updateChannels } = require('../../video');
 
 router.get('/', authCheck, connectionCheck, async (req, res) => {
   const userId = req.user.id;

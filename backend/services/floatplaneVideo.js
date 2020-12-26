@@ -1,4 +1,6 @@
 const { v4 } = require('uuid');
+const { Op } = require('sequelize');
+
 const { getCurrentTimestamp } = require('../common');
 const { getVideos } = require('../floatplaneApi');
 const { FloatplaneVideo } = require('../models/FloatplaneVideo');
@@ -38,4 +40,18 @@ module.exports.syncVideos = async (userId, channelId, cookie) => {
     console.error('ERROR - syncVideos():', error);
     return null;
   }
+};
+
+module.exports.getChannelVideos = async (channelId, automaticallyDownloadTimestamp) => {
+  // Get all of the relevant videos
+  const channelVideos = await FloatplaneVideo.findAll({
+    where: {
+      releaseDate: {
+        [Op.gte]: automaticallyDownloadTimestamp,
+      },
+      status: 'download',
+      channelId,
+    },
+  });
+  return channelVideos;
 };

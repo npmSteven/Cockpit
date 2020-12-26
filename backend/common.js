@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
 const { DateTime } = require('luxon');
 
 module.exports.respondError = (message) => {
@@ -65,22 +66,21 @@ module.exports.extractVideoDetails = (video) => {
   };
 };
 
-module.exports.throttle = (func, limit) => {
-  let inThrottle
-  return function() {
-    const args = arguments
-    const context = this
-    if (!inThrottle) {
-      func.apply(context, args)
-      inThrottle = true
-      setTimeout(() => inThrottle = false, limit)
-    }
-  }
-};
-
 module.exports.cleanTitle = (title) => {
   const titleWithoutSemicolon = title.replace(':', '');
   const titleWithoutForwardSlash = titleWithoutSemicolon.replace('/', '');
   const titleWithoutBackSlash = titleWithoutForwardSlash.replace('\\', '');
   return titleWithoutBackSlash;
+};
+
+module.exports.checkDir = (dir) => {
+  if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+  }
+}
+
+module.exports.checkDirs = (dirs) => {
+  for (const dir of dirs) {
+    this.checkDir(dir);
+  }
 };

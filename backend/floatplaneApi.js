@@ -58,3 +58,10 @@ module.exports.getVideoDownloads = async (videoId, cookie) => {
     return null;
   }
 }
+
+module.exports.buildVideoDownloadLink = (videoDownload, downloadQuality) => {
+  const edge = videoDownload.edges.find(edge => edge.allowDownload);
+  const uriWithQuality = videoDownload.resource.uri.replace('{qualityLevels}', downloadQuality);
+  const uriWithToken = uriWithQuality.replace('{token}', videoDownload.resource.data.token);
+  return `https://${edge.hostname}${uriWithToken}`;
+}

@@ -39,7 +39,7 @@ module.exports.FloatplaneVideo = sequelize.define(
       allowNull: false,
       defaultValue: 0,
     },
-    downloadStatus: {
+    status: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'download',
