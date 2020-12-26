@@ -131,7 +131,6 @@ const downloadAndUpdateStatus = async (
   dl.on('progress.throttled', async ({ progress, downloaded, speed }) => {
     await channelVideo.update({
       downloadProgress: Math.round(progress),
-      status: 'downloading',
       downloadedAmount: downloaded,
       downloadSpeed: speed,
     });
