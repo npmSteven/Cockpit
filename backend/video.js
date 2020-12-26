@@ -122,18 +122,26 @@ const downloadAndUpdateStatus = async (
     { fileName }
   );
 
-  dl.on('progress.throttled', async ({ progress }) => {
+  dl.on('download', async ({ totalSize }) => {
+    await channelVideo.update({
+      status: 'downloading',
+      downloadSize: totalSize,
+    });
+  });
+  dl.on('progress.throttled', async ({ progress, downloaded, speed }) => {
     await channelVideo.update({
       downloadProgress: Math.round(progress),
       status: 'downloading',
+      downloadedAmount: downloaded,
+      downloadSpeed: speed,
     });
   });
   dl.on('error', async (error) => {
-    await channelVideo.update({ downloadProgress: 0, status: 'failed' });
+    await channelVideo.update({ downloadProgress: 0, status: 'failed', downloadSpeed: 0 });
     console.log('ERROR - Download', error);
   });
   dl.on('end', async () => {
-    await channelVideo.update({ downloadProgress: 100, status: 'moving' });
+    await channelVideo.update({ downloadProgress: 100, status: 'moving', downloadSpeed: 0 });
     await moveFile(videoIncompleteDir, videoDir);
     await channelVideo.update({ downloadProgress: 100, status: 'downloaded' });
   });

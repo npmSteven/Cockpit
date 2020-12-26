@@ -44,6 +44,21 @@ module.exports.FloatplaneVideo = sequelize.define(
       allowNull: false,
       defaultValue: 'download',
     },
+    downloadedAmount: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    downloadSize: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    downloadSpeed: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: 0,
+    },
     createdAt: {
       type: DataTypes.BIGINT,
       allowNull: false,
