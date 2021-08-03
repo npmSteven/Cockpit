@@ -1,4 +1,4 @@
-# Cockpit
+# Cockpit (not being updated at the moment)
 Welcome to the Cockpit, where you'll be able to automatically download videos from floatplane.
 
 ## Current state and updates
